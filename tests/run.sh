@@ -5,13 +5,19 @@
 #
 #   bash tests/run.sh            run all tests
 #   bash tests/run.sh --update-example   also refresh examples/sample-scan-linux.json
+#   RUNTIMECLEAR_TEST_PWSH=0 bash tests/run.sh   skip the pwsh parity tests even if pwsh exists
+#
+# Runs on Linux and on macOS with the stock /bin/bash 3.2.
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd -P)
 SCANNER="$HERE/../runtimeclear.sh"
 EXAMPLE="$HERE/../examples/sample-scan-linux.json"
 UPDATE_EXAMPLE=0; [ "${1:-}" = "--update-example" ] && UPDATE_EXAMPLE=1
 
-FIX=$(mktemp -d); trap 'rm -rf "$FIX"' EXIT
+# Resolve symlinks in the temp path (macOS: /var -> /private/var) so it matches the
+# real paths the scanner reports.
+FIX=$(cd "$(mktemp -d)" && pwd -P); trap 'rm -rf "$FIX"' EXIT
+case "$(uname -s)" in Darwin) PLATFORM=macos ;; *) PLATFORM=linux ;; esac
 PASS=0; FAIL=0
 ok()   { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
 bad()  { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
@@ -111,9 +117,9 @@ check "summary: 6 built by Oracle" grep -q 'Built by Oracle: *6 ' "$FIX/stderr1"
 check "summary: 10 Oracle references" grep -q 'Oracle references in repos: *10 ' "$FIX/stderr1"
 check "no java executed for homes with a release file" [ ! -e "$MARKER" ]
 
-py_checks "$OUT" "$FIX" <<'PY'
+py_checks "$OUT" "$FIX" "$PLATFORM" <<'PY'
 import json, sys
-d = json.load(open(sys.argv[1])); fix = sys.argv[2]
+d = json.load(open(sys.argv[1])); fix = sys.argv[2]; platform = sys.argv[3]
 fails = 0
 def t(name, cond):
     global fails
@@ -121,7 +127,7 @@ def t(name, cond):
     fails += 0 if cond else 1
 t("top-level keys exactly per schema", list(d) == ["schema","scanner","scannedAt","host","installs","references","autoUpdate","warnings"])
 t("schema id", d["schema"] == "runtimeclear.scan/v1")
-t("scanner block", d["scanner"] == {"name":"runtimeclear","version":"1.0.1","platform":"linux"})
+t("scanner block", d["scanner"] == {"name":"runtimeclear","version":"1.0.1","platform":platform})
 keys = ["path","source","javaVersion","rawVersion","implementor","buildType","runtimeName","isJre","packageVendor","licenseFile"]
 t("every install has exactly the schema keys", all(list(i) == keys for i in d["installs"]))
 by = {i["path"].replace(fix + "/jvm/", ""): i for i in d["installs"]}
@@ -166,7 +172,7 @@ t("file paths are prefixed with the repo folder name", all(r["file"].startswith(
 gh = [r for r in d["references"] if r["hint"] == "oracle-setup-java"]
 t("setup-java text includes nearby java-version", bool(gh) and "java-version: '21'" in gh[0]["text"])
 t("every reference has exactly the schema keys", all(list(r) == ["file","line","kind","text","hint"] for r in d["references"]))
-t("autoUpdate is an empty array on Linux", d["autoUpdate"] == [])
+t("autoUpdate is an empty array (no system locations scanned)", d["autoUpdate"] == [])
 t("no warnings", d["warnings"] == [])
 sys.exit(1 if fails else 0)
 PY
@@ -239,7 +245,9 @@ else
 fi
 
 echo "Test 6: runtimeclear.ps1 under pwsh gives the same results as runtimeclear.sh"
-if command -v pwsh >/dev/null 2>&1; then
+if [ "${RUNTIMECLEAR_TEST_PWSH:-1}" = 0 ]; then
+  echo "  skip (RUNTIMECLEAR_TEST_PWSH=0)"
+elif command -v pwsh >/dev/null 2>&1; then
   PS1="$HERE/../runtimeclear.ps1"
   check "ps1 parses without errors" sh -c "pwsh -NoProfile -Command '\$t=\$null;\$e=\$null;[void][System.Management.Automation.Language.Parser]::ParseFile(\"$PS1\",[ref]\$t,[ref]\$e); exit \$e.Count'"
   # Crude guard against PowerShell 7-only syntax (?? ?. ternary, && || chains, -Parallel).
