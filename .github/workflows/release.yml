@@ -1,0 +1,159 @@
+name: Release
+
+# Push a tag such as v1.0.2 to publish a release. To re-publish the assets (and add
+# attestations) for an existing tag, run this workflow manually from main.
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to publish, e.g. v1.0.1. Assets with the same names are replaced.
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+
+jobs:
+  verify:
+    name: Verify version and run tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Validate the tag name
+        run: |
+          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Tag '$TAG' is not of the form vX.Y.Z."
+            exit 1
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          persist-credentials: false
+
+      - name: VERSION in both scripts equals the tag
+        run: |
+          version=${TAG#v}
+          sh_version=$(sed -n 's/^VERSION="\([^"]*\)".*$/\1/p' runtimeclear.sh | head -n 1)
+          ps_version=$(awk -F"'" '/^\$ScannerVersion[[:space:]]*=/ { print $2; exit }' runtimeclear.ps1)
+          echo "tag=$version runtimeclear.sh=$sh_version runtimeclear.ps1=$ps_version"
+          if [ "$sh_version" != "$version" ] || [ "$ps_version" != "$version" ]; then
+            echo "::error::VERSION mismatch: tag $version, runtimeclear.sh '$sh_version', runtimeclear.ps1 '$ps_version'."
+            exit 1
+          fi
+
+      - name: CHANGELOG has a section for this version
+        run: |
+          version=${TAG#v}
+          if grep -q "^## \[$version\] - [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" CHANGELOG.md 2>/dev/null; then
+            exit 0
+          fi
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            # Tags created before CHANGELOG.md existed (v1.0.0, v1.0.1) can still get attested assets.
+            echo "::warning::CHANGELOG.md at $TAG has no section for $version; release notes will only contain verification steps."
+            exit 0
+          fi
+          echo "::error::CHANGELOG.md has no '## [$version] - YYYY-MM-DD' section."
+          exit 1
+
+      - name: Install strace (enables the no-network test)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends strace
+
+      - name: Run tests/run.sh
+        run: bash tests/run.sh
+
+      - name: Smoke test on pwsh
+        if: hashFiles('tests/smoke.ps1') != ''
+        run: pwsh -NoProfile -File tests/smoke.ps1
+
+  publish:
+    name: Build, attest and publish
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write     # create the release and upload assets
+      id-token: write     # OIDC token for the Sigstore signing certificate
+      attestations: write # store the build provenance attestations
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          persist-credentials: false
+
+      - name: Generate SHA256SUMS
+        run: |
+          mkdir -p dist
+          cp runtimeclear.sh runtimeclear.ps1 dist/
+          (cd dist && sha256sum runtimeclear.sh runtimeclear.ps1 > SHA256SUMS)
+          cat dist/SHA256SUMS
+          if ! cmp -s dist/SHA256SUMS SHA256SUMS; then
+            echo "::error::SHA256SUMS committed at $TAG does not match the scripts. Run 'sha256sum runtimeclear.sh runtimeclear.ps1 > SHA256SUMS', commit, and tag again."
+            exit 1
+          fi
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          version=${TAG#v}
+          touch CHANGELOG.md
+          awk -v head="## [$version]" '
+            index($0, head) == 1 { found = 1; next }
+            found && /^## \[/    { exit }
+            found                { print }
+          ' CHANGELOG.md | sed -e '/./,$!d' > "$RUNNER_TEMP/notes.md"
+          if [ ! -s "$RUNNER_TEMP/notes.md" ]; then
+            if [ "$GITHUB_EVENT_NAME" != workflow_dispatch ]; then
+              echo "::error::The CHANGELOG.md section for $version is empty."
+              exit 1
+            fi
+            echo "Assets for $TAG, rebuilt from the tagged commit." > "$RUNNER_TEMP/notes.md"
+          fi
+          cat >> "$RUNNER_TEMP/notes.md" <<NOTES
+
+          ### Verify the download
+
+          \`\`\`sh
+          sha256sum -c SHA256SUMS          # macOS: shasum -a 256 -c SHA256SUMS
+          gh attestation verify runtimeclear.sh --repo ${GITHUB_REPOSITORY}
+          gh attestation verify runtimeclear.ps1 --repo ${GITHUB_REPOSITORY}
+          \`\`\`
+
+          Full changelog: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/CHANGELOG.md)
+          NOTES
+          cat "$RUNNER_TEMP/notes.md"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-path: |
+            dist/runtimeclear.sh
+            dist/runtimeclear.ps1
+            dist/SHA256SUMS
+
+      - name: Create the release or replace its assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          assets=(dist/runtimeclear.sh dist/runtimeclear.ps1 dist/SHA256SUMS)
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG exists: uploading assets with --clobber (notes are left unchanged)."
+            gh release upload "$TAG" "${assets[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "RuntimeClear $TAG" \
+              --notes-file "$RUNNER_TEMP/notes.md" \
+              --verify-tag
+          fi
