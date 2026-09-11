@@ -1,0 +1,5 @@
+# Used by CI and by `shellcheck runtimeclear.sh tests/run.sh` locally.
+shell=bash
+# SC2015: `[ -f "$f" ] && [ -r "$f" ] || continue` is a deliberate guard. Both tests
+# have no side effects, so "C runs when A is true" cannot happen in a harmful way.
+disable=SC2015

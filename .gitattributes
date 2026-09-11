@@ -1,0 +1,23 @@
+# Line endings are pinned so the bytes you check out are the bytes in SHA256SUMS,
+# on every OS and whether you use git, a release asset or a raw download.
+#
+# Both scripts use LF everywhere, including runtimeclear.ps1:
+# - bash fails on CRLF ($'\r': command not found), so *.sh must be LF.
+# - Windows PowerShell 5.1 and PowerShell 7 both parse LF scripts without issue.
+#   Forcing CRLF on *.ps1 would make a Windows checkout, the release asset and a raw
+#   download differ byte for byte, and the published checksum would only match one.
+# - runtimeclear.ps1 is pure ASCII, so it needs no BOM on Windows PowerShell 5.1.
+#   Keep it ASCII (CONTRIBUTING.md): non-ASCII text without a BOM is misread by 5.1.
+
+* text=auto eol=lf
+
+*.sh        text eol=lf
+*.ps1       text eol=lf
+*.psd1      text eol=lf
+SHA256SUMS  text eol=lf
+*.md        text eol=lf
+*.json      text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+
+LICENSE     text eol=lf
