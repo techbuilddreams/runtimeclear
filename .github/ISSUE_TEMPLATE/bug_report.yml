@@ -1,0 +1,85 @@
+name: Bug report
+description: The scanner failed, wrote invalid JSON, missed a Java install or a repo reference, or did something the README doesn't describe.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        - **Security issues** (a network connection, a write outside the JSON file, data the README says is not collected) must be reported privately. See [SECURITY.md](https://github.com/techbuilddreams/runtimeclear/blob/main/SECURITY.md).
+        - **Wrong license status** in the report? Use the *Misclassification report* form instead.
+  - type: input
+    id: version
+    attributes:
+      label: Scanner version
+      description: Output of `bash runtimeclear.sh --version` or `.\runtimeclear.ps1 -Version`.
+      placeholder: runtimeclear 1.0.1
+    validations:
+      required: true
+  - type: dropdown
+    id: script
+    attributes:
+      label: Script
+      options:
+        - runtimeclear.sh
+        - runtimeclear.ps1
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system and version
+      placeholder: "macOS 15.6 (arm64) / Ubuntu 24.04 / Windows Server 2022"
+    validations:
+      required: true
+  - type: input
+    id: shell
+    attributes:
+      label: Shell version
+      description: "`bash --version` (first line) or `$PSVersionTable.PSVersion`."
+      placeholder: "GNU bash 3.2.57 / PowerShell 5.1.20348"
+    validations:
+      required: true
+  - type: input
+    id: privileges
+    attributes:
+      label: Run as
+      placeholder: "normal user / sudo / elevated Administrator prompt"
+  - type: textarea
+    id: command
+    attributes:
+      label: Command you ran
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Include the summary or error printed to stderr.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: json
+    attributes:
+      label: Relevant part of the JSON output (redacted)
+      description: Only the entries involved, with usernames, hostnames and internal paths replaced by placeholders. `--anonymize` only hashes the hostname.
+      render: json
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I removed hostnames, usernames, internal paths and repository names I don't want to publish.
+          required: true
+        - label: I checked the latest release and searched existing issues.
+          required: true

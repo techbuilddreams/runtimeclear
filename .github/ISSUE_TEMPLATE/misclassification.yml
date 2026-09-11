@@ -1,0 +1,89 @@
+name: Misclassification report
+description: The report shows the wrong license status for a Java install or repo reference.
+title: "[Misclassification]: "
+labels: ["misclassification"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The scanner records facts; the report applies the rules in [docs/LICENSE-RULES.md](https://github.com/techbuilddreams/runtimeclear/blob/main/docs/LICENSE-RULES.md). To fix a rule we need the exact entry the report saw and a source for the status you expect. See [Reporting a misclassification](https://github.com/techbuilddreams/runtimeclear/blob/main/CONTRIBUTING.md#reporting-a-misclassification).
+
+        RuntimeClear is not legal advice and is not affiliated with Oracle.
+  - type: input
+    id: version
+    attributes:
+      label: Scanner version
+      description: The `scanner.version` value from the JSON file.
+      placeholder: 1.0.1
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system of the scanned machine
+      options:
+        - Linux
+        - macOS
+        - Windows
+    validations:
+      required: true
+  - type: input
+    id: os_version
+    attributes:
+      label: OS version
+      placeholder: "RHEL 9.4 / macOS 15.6 / Windows Server 2022"
+  - type: textarea
+    id: entry
+    attributes:
+      label: Install entry from the JSON (redacted)
+      description: Copy one object from `installs` (or `references`). Keep every field except personal or internal names in `path` or `file`, which you can replace with placeholders.
+      render: json
+      placeholder: |
+        {"path": "/usr/lib/jvm/<name>", "source": "filesystem", "javaVersion": "17.0.13",
+         "rawVersion": "17.0.13+10-LTS-268", "implementor": "Oracle Corporation", "buildType": "commercial",
+         "runtimeName": null, "isJre": false, "packageVendor": null, "licenseFile": "OTN"}
+    validations:
+      required: true
+  - type: dropdown
+    id: shown
+    attributes:
+      label: Status the report showed
+      options:
+        - free
+        - at_risk
+        - paid_license
+        - needs_review
+    validations:
+      required: true
+  - type: dropdown
+    id: expected
+    attributes:
+      label: Status you expect
+      options:
+        - free
+        - at_risk
+        - paid_license
+        - needs_review
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source or citation
+      description: A link to Oracle release notes, the Java SE FAQ or support roadmap, the license text shipped with the build, or the vendor's documentation, plus the relevant quote.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Where the build came from (optional)
+      description: Download page, package name, container image, installer, or how it got onto the machine.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I removed usernames, hostnames and internal names from the entry.
+          required: true
+        - label: I understand that RuntimeClear is not legal advice and that the report is not a license determination by Oracle.
+          required: true

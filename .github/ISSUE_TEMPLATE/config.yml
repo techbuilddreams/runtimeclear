@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/techbuilddreams/runtimeclear/security/advisories/new
+    about: Report security issues privately through GitHub. Please do not open a public issue.
+  - name: Support for the RuntimeClear report
+    url: https://runtimeclear.com/support/
+    about: Questions about the browser report, a purchase, billing or refunds.

@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest a new detection, output field or option.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to find or do, and what does the scanner miss today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: For a new detection, include example file paths or lines and where they come from (installer, package, image, CI system).
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Platforms
+      multiple: true
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Repo scanning (all platforms)
+    validations:
+      required: true
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Project principles
+      description: See [CONTRIBUTING.md](https://github.com/techbuilddreams/runtimeclear/blob/main/CONTRIBUTING.md#principles).
+      options:
+        - label: The change keeps the scanners read-only, with no network access and no new dependencies.
+          required: true
