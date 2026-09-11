@@ -1,0 +1,228 @@
+{
+  "schema": "runtimeclear.scan/v1",
+  "scanner": {
+    "name": "runtimeclear",
+    "version": "1.0.0",
+    "platform": "linux"
+  },
+  "scannedAt": "2026-09-11T14:28:06Z",
+  "host": {
+    "hostname": "app-prod-03",
+    "os": "Red Hat Enterprise Linux 9.4 (Plow)",
+    "arch": "x86_64"
+  },
+  "installs": [
+    {
+      "path": "/usr/lib/jvm/java-17-amazon-corretto",
+      "source": "filesystem",
+      "javaVersion": "17.0.12",
+      "rawVersion": "17.0.12+7-LTS",
+      "implementor": "Amazon.com Inc.",
+      "buildType": null,
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": null,
+      "licenseFile": "GPL"
+    },
+    {
+      "path": "/opt/jdk-21",
+      "source": "filesystem",
+      "javaVersion": "21",
+      "rawVersion": "21+35-2513",
+      "implementor": "Oracle Corporation",
+      "buildType": null,
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": null,
+      "licenseFile": null
+    },
+    {
+      "path": "/opt/legacyapp/jre",
+      "source": "filesystem",
+      "javaVersion": "1.8.0_391",
+      "rawVersion": "1.8.0_391-b13",
+      "implementor": "unknown",
+      "buildType": null,
+      "runtimeName": "Java(TM) SE Runtime Environment",
+      "isJre": true,
+      "packageVendor": null,
+      "licenseFile": null
+    },
+    {
+      "path": "/usr/lib/jvm/jdk1.8.0_202",
+      "source": "filesystem",
+      "javaVersion": "1.8.0_202",
+      "rawVersion": "1.8.0_202",
+      "implementor": "unknown",
+      "buildType": "commercial",
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": null,
+      "licenseFile": null
+    },
+    {
+      "path": "/usr/lib/jvm/jdk-17-oracle-x64",
+      "source": "filesystem",
+      "javaVersion": "17.0.13",
+      "rawVersion": "17.0.13+10-LTS-268",
+      "implementor": "Oracle Corporation",
+      "buildType": "commercial",
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": null,
+      "licenseFile": "OTN"
+    },
+    {
+      "path": "/usr/lib/jvm/jdk-21-oracle-x64",
+      "source": "filesystem",
+      "javaVersion": "21.0.4",
+      "rawVersion": "21.0.4+8-LTS-274",
+      "implementor": "Oracle Corporation",
+      "buildType": "commercial",
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": null,
+      "licenseFile": "NFTC"
+    },
+    {
+      "path": "/usr/lib/jvm/jre1.8.0_351",
+      "source": "filesystem",
+      "javaVersion": "1.8.0_351",
+      "rawVersion": "1.8.0_351",
+      "implementor": "Oracle Corporation",
+      "buildType": "commercial",
+      "runtimeName": null,
+      "isJre": true,
+      "packageVendor": null,
+      "licenseFile": null
+    },
+    {
+      "path": "/usr/lib/jvm/temurin-21-jdk-amd64",
+      "source": "filesystem",
+      "javaVersion": "21.0.4",
+      "rawVersion": "21.0.4+7-LTS",
+      "implementor": "Eclipse Adoptium",
+      "buildType": null,
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": null,
+      "licenseFile": "GPL"
+    }
+  ],
+  "references": [
+    {
+      "file": "billing-service/.github/workflows/build.yml",
+      "line": 6,
+      "kind": "github-actions",
+      "text": "          distribution: 'oracle' | java-version: '21'",
+      "hint": "oracle-setup-java"
+    },
+    {
+      "file": "billing-service/.gitlab-ci.yml",
+      "line": 2,
+      "kind": "gitlab-ci",
+      "text": "  image: store/oracle/serverjre:8",
+      "hint": "oracle-image"
+    },
+    {
+      "file": "billing-service/.java-version",
+      "line": 1,
+      "kind": "jenv",
+      "text": "21",
+      "hint": "unknown"
+    },
+    {
+      "file": "billing-service/.sdkmanrc",
+      "line": 1,
+      "kind": "sdkman",
+      "text": "java=21.0.4-oracle",
+      "hint": "oracle-sdkman"
+    },
+    {
+      "file": "billing-service/.tool-versions",
+      "line": 2,
+      "kind": "asdf",
+      "text": "java oracle-21.0.4",
+      "hint": "oracle-vendor"
+    },
+    {
+      "file": "billing-service/Dockerfile",
+      "line": 1,
+      "kind": "dockerfile",
+      "text": "FROM container-registry.oracle.com/java/jdk:21",
+      "hint": "oracle-image"
+    },
+    {
+      "file": "billing-service/Dockerfile",
+      "line": 2,
+      "kind": "dockerfile",
+      "text": "RUN curl -LO https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz",
+      "hint": "oracle-download"
+    },
+    {
+      "file": "billing-service/Jenkinsfile",
+      "line": 1,
+      "kind": "script",
+      "text": "sh 'wget https://www.oracle.com/java/technologies/downloads/#java8'",
+      "hint": "oracle-download"
+    },
+    {
+      "file": "billing-service/build.gradle",
+      "line": 4,
+      "kind": "gradle-toolchain",
+      "text": "    vendor = JvmVendorSpec.ORACLE",
+      "hint": "oracle-vendor"
+    },
+    {
+      "file": "billing-service/docker-compose.yml",
+      "line": 3,
+      "kind": "compose",
+      "text": "    image: eclipse-temurin:21-jre",
+      "hint": "free-image"
+    },
+    {
+      "file": "billing-service/docker/app.dockerfile",
+      "line": 1,
+      "kind": "dockerfile",
+      "text": "FROM openjdk:17-jdk-slim",
+      "hint": "openjdk-deprecated-image"
+    },
+    {
+      "file": "billing-service/k8s/deployment.yaml",
+      "line": 3,
+      "kind": "k8s",
+      "text": "    - image: \"openjdk:11\"",
+      "hint": "openjdk-deprecated-image"
+    },
+    {
+      "file": "billing-service/k8s/deployment.yaml",
+      "line": 4,
+      "kind": "k8s",
+      "text": "    - image: mcr.microsoft.com/openjdk/jdk:21-ubuntu",
+      "hint": "free-image"
+    },
+    {
+      "file": "billing-service/k8s/deployment.yaml",
+      "line": 5,
+      "kind": "k8s",
+      "text": "    - image: azul/zulu-openjdk:17",
+      "hint": "free-image"
+    },
+    {
+      "file": "billing-service/pom.xml",
+      "line": 1,
+      "kind": "maven-toolchain",
+      "text": "<toolchain><provides><version>21</version><vendor>oracle</vendor></provides></toolchain>",
+      "hint": "oracle-vendor"
+    },
+    {
+      "file": "billing-service/scripts/install.sh",
+      "line": 3,
+      "kind": "script",
+      "text": "wget https://download.oracle.com/java/17/archive/jdk-17.0.12_linux-x64_bin.tar.gz",
+      "hint": "oracle-download"
+    }
+  ],
+  "autoUpdate": [],
+  "warnings": []
+}

@@ -1,0 +1,169 @@
+{
+  "schema": "runtimeclear.scan/v1",
+  "scanner": {
+    "name": "runtimeclear",
+    "version": "1.0.0",
+    "platform": "windows"
+  },
+  "scannedAt": "2026-09-11T15:42:07Z",
+  "host": {
+    "hostname": "WS-FIN-0142",
+    "os": "Microsoft Windows 11 Enterprise 10.0.22631",
+    "arch": "x86_64"
+  },
+  "installs": [
+    {
+      "path": "C:\\Program Files\\Java\\jdk-21",
+      "source": "registry",
+      "javaVersion": "21.0.4",
+      "rawVersion": "21.0.4+8-LTS-274",
+      "implementor": "Oracle Corporation",
+      "buildType": "commercial",
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": "Oracle Corporation",
+      "licenseFile": "NFTC"
+    },
+    {
+      "path": "C:\\Program Files\\Java\\jdk-17",
+      "source": "registry",
+      "javaVersion": "17.0.13",
+      "rawVersion": "17.0.13+10-LTS-268",
+      "implementor": "Oracle Corporation",
+      "buildType": "commercial",
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": "Oracle Corporation",
+      "licenseFile": "OTN"
+    },
+    {
+      "path": "C:\\Program Files\\Java\\jre1.8.0_351",
+      "source": "registry",
+      "javaVersion": "1.8.0_351",
+      "rawVersion": "1.8.0_351-b10",
+      "implementor": "Oracle Corporation",
+      "buildType": "commercial",
+      "runtimeName": null,
+      "isJre": true,
+      "packageVendor": "Oracle Corporation",
+      "licenseFile": null
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Java\\jre1.8.0_202",
+      "source": "registry",
+      "javaVersion": "1.8.0_202",
+      "rawVersion": "1.8.0_202",
+      "implementor": "unknown",
+      "buildType": "commercial",
+      "runtimeName": null,
+      "isJre": true,
+      "packageVendor": "Oracle Corporation",
+      "licenseFile": null
+    },
+    {
+      "path": "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.4.7-hotspot",
+      "source": "registry",
+      "javaVersion": "21.0.4",
+      "rawVersion": "21.0.4+7-LTS",
+      "implementor": "Eclipse Adoptium",
+      "buildType": null,
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": "Eclipse Adoptium",
+      "licenseFile": "GPL"
+    },
+    {
+      "path": "C:\\Program Files\\Amazon Corretto\\jdk17.0.12_7",
+      "source": "registry",
+      "javaVersion": "17.0.12",
+      "rawVersion": "17.0.12+7-LTS",
+      "implementor": "Amazon.com Inc.",
+      "buildType": null,
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": "Amazon",
+      "licenseFile": "GPL"
+    },
+    {
+      "path": "C:\\ProgramData\\LegacyVendor\\ReportServer\\jre",
+      "source": "process",
+      "javaVersion": "1.8.0_261",
+      "rawVersion": "1.8.0_261-b12",
+      "implementor": "unknown",
+      "buildType": null,
+      "runtimeName": "Java(TM) SE Runtime Environment",
+      "isJre": true,
+      "packageVendor": null,
+      "licenseFile": null
+    },
+    {
+      "path": "C:\\Users\\jdoe\\.jdks\\openjdk-21.0.2",
+      "source": "filesystem",
+      "javaVersion": "21.0.2",
+      "rawVersion": "21.0.2+13-58",
+      "implementor": "Oracle Corporation",
+      "buildType": null,
+      "runtimeName": null,
+      "isJre": false,
+      "packageVendor": null,
+      "licenseFile": null
+    }
+  ],
+  "references": [
+    {
+      "file": "payments-api/.github/workflows/ci.yml",
+      "line": 18,
+      "kind": "github-actions",
+      "text": "          distribution: 'oracle' | java-version: '21'",
+      "hint": "oracle-setup-java"
+    },
+    {
+      "file": "payments-api/Dockerfile",
+      "line": 1,
+      "kind": "dockerfile",
+      "text": "FROM container-registry.oracle.com/java/jdk:21-oraclelinux8",
+      "hint": "oracle-image"
+    },
+    {
+      "file": "payments-api/build.gradle.kts",
+      "line": 14,
+      "kind": "gradle-toolchain",
+      "text": "        vendor.set(JvmVendorSpec.ORACLE)",
+      "hint": "oracle-vendor"
+    },
+    {
+      "file": "payments-api/docker-compose.yml",
+      "line": 9,
+      "kind": "compose",
+      "text": "    image: eclipse-temurin:21-jre",
+      "hint": "free-image"
+    },
+    {
+      "file": "payments-api/scripts/install-jdk.ps1",
+      "line": 7,
+      "kind": "script",
+      "text": "$url = 'https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.msi'",
+      "hint": "oracle-download"
+    }
+  ],
+  "autoUpdate": [
+    {
+      "kind": "windows-java-auto-updater",
+      "enabled": true,
+      "detail": "Installed program 'Java Auto Updater' (publisher: Oracle Corporation)"
+    },
+    {
+      "kind": "windows-java-update-policy",
+      "enabled": true,
+      "detail": "HKLM:\\SOFTWARE\\WOW6432Node\\JavaSoft\\Java Update\\Policy EnableJavaUpdate=1 EnableAutoUpdateCheck=1"
+    },
+    {
+      "kind": "windows-java-update-scheduler",
+      "enabled": true,
+      "detail": "present: C:\\Program Files (x86)\\Common Files\\Java\\Java Update\\jusched.exe; starts at logon: HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Run\\SunJavaUpdateSched; jusched.exe is running"
+    }
+  ],
+  "warnings": [
+    "1 running java process(es) without a readable path (run as Administrator to include)."
+  ]
+}
