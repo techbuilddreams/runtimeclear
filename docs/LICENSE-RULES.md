@@ -101,7 +101,8 @@ CI build and test jobs count as "develop, test, prototype and demonstrate", whic
 | Signal | Meaning | Confidence / source |
 |---|---|---|
 | `java -version` runtime name `Java(TM) SE Runtime Environment` | Oracle JDK/JRE (Oracle GraalVM also prints it, so GraalVM is checked first) | Oracle JDK 11 release notes: "Oracle JDK will say `java` and include LTS. OpenJDK (when produced by Oracle) will say OpenJDK and not include the Oracle-specific LTS identifier." [link](https://www.oracle.com/java/technologies/javase/11-relnote-issues.html) (checked 2026-09-11) |
-| `release` file `BUILD_TYPE="commercial"` | Oracle JDK (commercial build) | **Not documented by Oracle.** The open-source build (`make/ReleaseFile.gmk` in openjdk/jdk21u) never writes `BUILD_TYPE`, so the key comes from Oracle's closed build. Widely observed in Oracle JDK release files. Treated as a strong signal |
+| bundled license text (`legal/java.base/LICENSE`, `LICENSE`, `COPYRIGHT`) naming OTN / NFTC / BCL / GPL | the license the build shipped with | Strongest signal when present; disagreement with version rules → needs_review. Oracle OpenJDK 20.0.x and Azul/Homebrew builds observed with GPL text (2026-09-11) |
+| `release` file `BUILD_TYPE="commercial"` | Oracle JDK (commercial build) | **Not documented by Oracle.** The open-source build (`make/ReleaseFile.gmk` in openjdk/jdk21u) never writes `BUILD_TYPE`, so the key comes from Oracle's closed build. Widely observed in Oracle JDK release files; confirmed on a real Oracle JDK 11.0.24 macOS install on 2026-09-11 (`IMPLEMENTOR="Oracle Corporation"`, `JAVA_RUNTIME_VERSION="11.0.24+7-LTS-271"`), while Oracle OpenJDK 20.0.x builds on the same machine had no `BUILD_TYPE`. Treated as a strong signal |
 | `IMPLEMENTOR="Oracle Corporation"` | Oracle JDK **or** Oracle OpenJDK (jdk.java.net). **Not enough on its own** | OpenJDK's default `COMPANY_NAME=N/A` ([branding.conf](https://github.com/openjdk/jdk21u/blob/master/make/conf/branding.conf)), so only Oracle-produced builds say Oracle. Engine returns needs_review when this is the only signal |
 | `OpenJDK Runtime Environment` | an OpenJDK (GPL) build | OpenJDK default branding `PRODUCT_NAME=OpenJDK`, `PRODUCT_SUFFIX="Runtime Environment"` |
 | rpm/dpkg vendor "Oracle" | **not used**: Oracle Linux ships GPL OpenJDK packages too | engine ignores it for Oracle JDK detection |
@@ -155,7 +156,7 @@ Also noted (not auto-classified): winget's `Oracle.JavaRuntimeEnvironment` manif
 
 ## 8. Not verified from an official source (flagged)
 
-1. `BUILD_TYPE="commercial"` as an Oracle JDK marker. Oracle does not document it (see §4). The engine still requires no conflicting OpenJDK signal.
+1. `BUILD_TYPE="commercial"` as an Oracle JDK marker. Oracle does not document it (see §4), though it was observed on a real Oracle JDK 11.0.24 install (2026-09-11). The engine still requires no conflicting OpenJDK signal.
 2. That jdk.java.net Oracle OpenJDK builds set `IMPLEMENTOR="Oracle Corporation"`. The engine returns needs_review when implementor is the only signal.
 3. Oracle JDK **21.0.13** being the first OTN build is inferred from CPU numbering. Oracle only says "October 2026 CPU". It is also not released yet.
 4. Middle price tiers ($12.00 to $5.70) come from the March 2023 price list edition. The current oracle.com PDF could not be fetched (robots.txt).

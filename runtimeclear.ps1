@@ -41,7 +41,7 @@ param(
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
 
-$ScannerVersion = '1.0.0'
+$ScannerVersion = '1.0.1'
 $SiteUrl        = 'https://runtimeclear.com'
 $JavaTimeoutMs  = 5000
 $MaxText        = 300
@@ -475,6 +475,9 @@ function Invoke-RepoScan([string]$RepoPath) {
     }
     foreach ($f in ($files | Sort-Object)) {
         $rel = $f.Substring($root.Length).TrimStart('\', '/') -replace '\\', '/'
+        # Skip RuntimeClear's own copy (its test fixtures mention Oracle on purpose).
+        $fdir = Split-Path -Parent $f
+        if ((Test-Path -LiteralPath (Join-Path $fdir 'runtimeclear.sh')) -or (Test-Path -LiteralPath (Join-Path (Split-Path -Parent $fdir) 'runtimeclear.sh'))) { continue }
         $kind = Get-RefKind (Split-Path -Leaf $f) $rel
         if (-not $kind) { continue }
         try {

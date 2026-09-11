@@ -121,7 +121,7 @@ def t(name, cond):
     fails += 0 if cond else 1
 t("top-level keys exactly per schema", list(d) == ["schema","scanner","scannedAt","host","installs","references","autoUpdate","warnings"])
 t("schema id", d["schema"] == "runtimeclear.scan/v1")
-t("scanner block", d["scanner"] == {"name":"runtimeclear","version":"1.0.0","platform":"linux"})
+t("scanner block", d["scanner"] == {"name":"runtimeclear","version":"1.0.1","platform":"linux"})
 keys = ["path","source","javaVersion","rawVersion","implementor","buildType","runtimeName","isJre","packageVendor","licenseFile"]
 t("every install has exactly the schema keys", all(list(i) == keys for i in d["installs"]))
 by = {i["path"].replace(fix + "/jvm/", ""): i for i in d["installs"]}
@@ -209,7 +209,7 @@ import json,sys; d=json.load(open('$FIX/nosys.json')); sys.exit(0 if d['installs
 bash "$SCANNER" --bogus >/dev/null 2>&1; check "unknown option exits 2" [ $? -eq 2 ]
 bash "$SCANNER" --repo "$FIX/does-not-exist" >/dev/null 2>&1; check "missing --repo dir exits 2" [ $? -eq 2 ]
 bash "$SCANNER" --help | grep -q -- '--anonymize'; check "--help lists flags" [ $? -eq 0 ]
-check "--version" sh -c "bash '$SCANNER' --version | grep -q '^runtimeclear 1.0.0$'"
+check "--version" sh -c "bash '$SCANNER' --version | grep -q '^runtimeclear 1.0.1$'"
 
 echo "Test 4: fallback timeout without GNU 'timeout' (macOS code path)"
 if [ "$(uname -s)" = Linux ]; then
@@ -253,7 +253,7 @@ import json, sys
 b = json.load(open(sys.argv[1])); p = json.load(open(sys.argv[2]))
 def t(n, c): print(("  ok   " if c else "  FAIL ") + n)
 t("ps1: top-level keys per schema", list(p) == list(b))
-t("ps1: platform windows", p["scanner"] == {"name":"runtimeclear","version":"1.0.0","platform":"windows"})
+t("ps1: platform windows", p["scanner"] == {"name":"runtimeclear","version":"1.0.1","platform":"windows"})
 t("ps1: host has hostname/os/arch", list(p["host"]) == ["hostname","os","arch"])
 key = lambda i: i["path"]
 t("ps1: installs identical to bash (all fields)", sorted(p["installs"], key=key) == sorted(b["installs"], key=key))

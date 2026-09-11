@@ -27,7 +27,7 @@
 set -u
 LC_ALL=C; export LC_ALL          # predictable grep/sed/awk behaviour on bytes
 
-VERSION="1.0.0"
+VERSION="1.0.1"
 SITE_URL="https://runtimeclear.com"
 SCHEMA="runtimeclear.scan/v1"
 JAVA_VERSION_TIMEOUT=5            # seconds allowed for `java -version`
@@ -507,6 +507,9 @@ scan_repo() {
       2>/dev/null | sort >"$TMP/repofiles"
   while IFS= read -r f <&3; do
     [ -r "$f" ] || { warn "Not readable: $f"; continue; }
+    # Skip RuntimeClear's own copy (its test fixtures mention Oracle on purpose).
+    d=$(dirname "$f")
+    if [ -f "$d/runtimeclear.sh" ] || [ -f "$(dirname "$d")/runtimeclear.sh" ]; then continue; fi
     grep -Iq . "$f" 2>/dev/null || continue          # skip binary and empty files
     rel=${f#"$root"/}
     base=$(basename "$f")
