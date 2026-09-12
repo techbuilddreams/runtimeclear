@@ -39,7 +39,7 @@ internal paths you don't want to share.
 
 ## What to expect
 
-RuntimeClear is maintained by a small team. These are targets, not guarantees:
+RuntimeClear is maintained by one person. These are targets, not guarantees:
 
 | Step | Target |
 |---|---|
